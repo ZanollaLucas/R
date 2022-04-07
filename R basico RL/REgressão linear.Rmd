@@ -1,0 +1,143 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+
+
+```{r}
+library(readxl)
+dados <- read_excel("C:/Users/LucasZan/Desktop/Alura/regressaolinear_r-master/dados.xlsx")
+View(dados)
+```
+
+Plot diagrama de disperção, help("plot"), correlação cor(), teste de correlação cor.test()
+
+
+```{r}
+plot(dados$area,dados$preco, main = "Diagrama de Dispersão", xlab = "Área", ylab = "Preço das casas")
+cor(dados$area,dados$preco)
+cor.test(dados$area,dados$preco)
+
+```
+
+```{r}
+plot(dados$tempo,dados$preco, main = "Diagrama de Dispersão", xlab = "Idade", ylab = "Preço das casas")
+cor(dados$tempo,dados$preco)
+cor.test(dados$tempo,dados$preco)
+```
+
+boxplot(dados$preço)
+summary()
+packages CAR
+
+```{r}
+boxplot(dados$preco)
+summary(dados$preco)
+
+library(car)
+#boxplot mostra a posição do dado q esta no outlier
+Boxplot(dados$preco)
+
+```
+
+
+```{r}
+modl <- lm(preco ~ area , data = dados)
+modl
+
+plot(dados$area,dados$preco, main = "Diagrama de Dispersão", xlab = "Área", ylab = "Preço das casas")
+abline(modl, col= "red")
+
+summary(modl)
+```
+preço = beta0 + beta1*area
+ b0 = intercept
+
+
+```{r}
+modl2 <- lm(preco ~ tempo , data = dados)
+modl2
+
+plot(dados$tempo,dados$preco, main = "Diagrama de Dispersão", xlab = "tempo", ylab = "Preço das casas")
+abline(modl2, col= "red")
+
+summary(modl2)
+```
+
+IDENTIFICANDO OS RESIDUOS DO MODELO
+
+```{r}
+plot(modl$residuals)
+
+
+## identify(modl$residuals,n=2)
+## se vc clicar nos pontos q vc quer ele te diz o indice (notbook nao funciona)
+```
+
+REMOVENDO DADOS DO DATA FRAME
+
+```{r}
+dados_filtrados <- dados[c(-59,-82),]
+```
+
+
+TEste de Durbin-Watson (testa independencia das variávies)
+```{r}
+library(lmtest)
+
+dwtest(modl)
+
+bptest(modl)
+```
+
+
+Verificando se os dados são de distribuição normal por um grafico usando o plot(__, 2) e usando o teste de shapiro com os residuos
+```{r}
+plot(modl, 2)
+
+shapiro.test(modl$residuals)
+```
+
+
+
+GERANDO PREDIÇÕES USANDO OS MODELOS (Deve-se criar modelos estudando as suas variáveis e possíveis correlações entre elas)
+
+```{r}
+modl3 <- lm(preco ~ tempo + area , data = dados)
+summary(modl3)
+cor(dados$area,dados$tempo)
+
+```
+
+Os rulstados mostram q há uma correlação entre a area e o tempo e que o tempo tem uma significancia fraca pra a regressão linear ou seja é melhor fazer só com a area
+
+```{r}
+dados_novos <- data.frame(area = c(60,70,80))
+
+predict(modl, newdata = dados_novos, interval = "prediction")
+#é possivel variar o intervalo com interval = "confidence"
+```
+De acordo com o modelo o preço das casas tem o valor provavel fit, podendo varias de lwr e upr
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

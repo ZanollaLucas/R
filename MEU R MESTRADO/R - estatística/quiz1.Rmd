@@ -1,0 +1,136 @@
+---
+title: "Quiz 14/4 (1)"
+author: "Lucas Zanolla"
+date: "13 de abril de 2018"
+output_file: html_document
+---
+```{r, echo=FALSE}
+library(tigerstats)
+```
+Foi utilizado a "library(tigerstats)" para resolver algumas dessas questões.
+
+1) Um designer industrial quer determinar o tempo médio que leva um adulto para montar
+um brinquedo "fácil de montar". Uma amostra de 16 vezes produziu um tempo médio de
+19,92 minutos, com um desvio padrão da amostra de 5,73 minutos. Assumindo a
+normalidade dos tempos de montagem, forneça um intervalo de confiança de 95% para o
+tempo médio de montagem.
+
+```{r, echo=TRUE}
+ttestGC(mean = 19.92, sd = 5.73, n = 16, conf.level = 0.95)
+```
+
+2) Uma amostra aleatória de 30 domicílios foi selecionada como parte de um estudo sobre
+uso de eletricidade, e o número de quilowatts-hora (kWh) foi registrado para cada
+domicílio na amostra para o trimestre de março de 2006. O uso médio foi de 375kWh . Em
+um estudo muito grande no trimestre de março do ano anterior, verificou-se que o desvio
+padrão do uso foi de 81 kWh. Assumindo que o desvio padrão é inalterado e que o uso é
+normalmente distribuído, forneça um intervalo de confiança de 99% para o uso médio no
+trimestre de março de 2006. 
+
+
+```{r, echo=TRUE}
+ttestGC(mean = 375, sd = 81, n = 30, conf.level = 0.99)
+```
+
+3) Qual é o menor tamanho de amostra necessário para fornecer um intervalo de
+confiança de 95% para uma média, se for importante que o intervalo não seja maior que 1
+cm? Você pode assumir que a população é normal com variância de 9cm2.
+A) 1245 B) 34 C) 95 D) 139 
+
+Utilizada a formula de Quantidade de amostra para variável contínua em população infinita.
+z=1.96 se considerado confiança de 95% 
+e se o intervalo nao pode ser maior que 1, ou seja -0.5 até 0.5
+
+```{r, echo=TRUE}
+n<- (1.96* sqrt(9)/0.5)^2
+n
+```
+Resposta lebra D) 139.
+
+
+4) O preço de varejo recomendado de uma marca de jeans é de US $ 150. O preço do
+jeans em uma amostra de 16 varejistas é em média US $ 141 com um desvio padrão da
+amostra de 4. Se esta for uma amostra "aleatória" e os preços puderem ser considerados
+como normalmente distribuídos, construa um intervalo de confiança de 95% para o preço
+médio de venda. 
+
+```{r, echo=TRUE}
+ttestGC(mean = 141, sd = 4, n = 16, conf.level = 0.95)
+```
+
+5) A finura média µ, de um determinado fio é esperado ser maior do que o valor padrão de
+5 unidades. Para testar essa alegação, a fábrica classificou 16 espécimes do fio e
+encontrou que a média da amostra foi 5,9 unidades. Quais são as hipóteses nula e
+alternativa que estão sendo testadas? Exatamente uma opção deve estar correta)
+Suponha que a medida de finura é normalmente distribuída com uma variância ??2=4
+
+Qual seria a sua conclusão em relação ao teste de hipótese escolhido acima (alfa=0,05). 
+
+
+```{r, echo=TRUE}
+ttestGC(mean = 5.9, sd = 2, n = 16, conf.level = 0.95)
+
+```
+O valor esperado está dentro do esperado utilizando o alfa de 0.05, ou seja o resultado é a letra D.
+
+
+
+6) Um processo de fabricação produz componentes que têm peso normalmente
+distribuído em torno de 60g com um desvio padrão de 1,2g. Um novo processo foi
+desenvolvido para reduzir custos. Abaixo estão os pesos de uma amostra aleatória de 15
+componentes produzidos pelo novo processo:
+60,3 59,8 62,5 60,8 61,6 59,9 61,2 59,4
+61,0 58,9 62,1 60,7 59,1 60,2 63,1
+A gerência deseja saber se o novo processo resulta em um peso médio diferente. Quais
+das seguintes são as hipóteses nula e alternativa mais apropriadas? Exatamente uma
+opção deve estar correta)
+
+
+```{r, echo=TRUE}
+novo<- c(60.3, 59.8, 62.5, 60.8, 61.6, 59.9, 61.2, 59.4, 61.0, 58.9, 62.1, 60.7, 59.1, 60.2, 63.1)
+mean(novo)
+
+```
+letra A H0: u = 60 ;H1: u > 60
+
+A gerência deseja saber se o novo processo resulta em um peso médio diferente.
+Assumindo que o desvio padrão é inalterado para o novo processo, qual das seguintes é
+a estatística de teste mais apropriada, para t?
+B) Pois é utilizado a diferença da média para ser calculado o T.
+
+
+
+
+
+Quiz2: Test t para duas médias
+Crie dois conjuntos de dados com os seguintes nomes:
+. conj1: Dez observações de uma amostra de uma distribuição normal com
+média 6 e desvio padrão 3
+. conj2: Idem para uma distribuição normal com média 7.5 e desvio
+padrão 3.2
+DICA: 1) utilize a função rnorm(); 2) Use as facilidades do pacote tigerstats
+Teste a hipótese
+Use o IC de 95% para testar a hipótese
+Relate o resultado encontrado.
+Faça o teste novamente mas agora o conjunto 1 tem 50 observações e o 2 tem
+35. A média e o desvio padrão em cada um dos conjuntos permanecem os
+mesmos.
+Use o IC de 99% para testar a hipótese
+Relate o resultado encontrado e compare os dois resultados. 
+
+
+```{r , echo=TRUE}
+conj1 <- rnorm(10, 6, 3)
+conj2 <- rnorm(10, 7.5, 3.2)
+conj3 <- rnorm(50, 6, 3)
+conj4 <- rnorm(35, 7.5, 3.2)
+
+
+t.test(conj1,conj2, alternative = "two.sided",conf.level = 0.95)
+t.test(conj3,conj4, alternative = "two.sided", conf.level = 0.99)
+
+
+
+```
+se p for menor que o alpha, regeita a hipotese nula. 
+ou seja para a primeira coleta de dados a hipotese nula é aceita mas,vendo os resultados é possivel concluir que mesmo com um indice de confiança maior, o erro amostral foi menor, simplismente por causa da quantidade da população estudada. E na segunda alternativa com uma população maior a hipotese nula é regeitada.

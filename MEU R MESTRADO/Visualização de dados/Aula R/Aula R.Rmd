@@ -1,0 +1,118 @@
+---
+title: "Aula R visualizações"
+author: "Lucas Zanolla"
+date: "19 de abril de 2018"
+output_output: html_document
+---
+
+```{r, echo=TRUE}
+library(rgdal)
+library(leaflet)
+library(RColorBrewer)
+library(classInt)
+```
+
+```{r, echo=TRUE}
+arquivo = "C:/Users/LucasZanolla/Desktop/Mestrado/Visualização de dados/Aula R"
+```
+
+##Shapefiles Brasil com estados
+
+```{r, echo=T}
+shape_br <- readOGR(arquivo, "estados", GDAL1_integer64_policy = TRUE)
+plot(shape_br)
+
+```
+
+Filtrando com estado Rs e depois planalto medio, o filtro faz o plot (shape) na posição correta
+```{r, echo=TRUE}
+shape_rs <- readOGR(arquivo, "municipiors", GDAL1_integer64_policy = TRUE)
+plot(shape_rs)
+shape_pm <- shape_rs[shape_rs$MUNICIPIO %in% c("Carazinho","Vila Maria", "Passo Fundo", "Casca", "Marau"),]
+plot(shape_pm)
+
+```
+
+Utilizando o dados dos shapes das estradas:
+
+```{r, echo=TRUE}
+shape_viario_rs <- readOGR(arquivo, "sistemaviariors", GDAL1_integer64_policy = TRUE)
+
+shape_brs <- shape_viario_rs[shape_viario_rs$NOME %in% c("BR 116", "BR 386", "BR 101"),]
+plot(shape_brs)
+
+```
+
+#para mostrar as peletas de cores disponiveis no pacote RColorBrewer
+
+display.brewer.all()
+colors <- brewer.pal(11, "spectral")
+
+#inicializando mapa mundo
+
+```{r, echo=TRUE}
+
+leaflet() %>% addTiles() %>% setView(lng = -52.4, lat = -28,2, zoom = 4)
+
+mapa = leaflet() %>% addTiles()
+
+#exemplo mapa 1
+
+mapa %>%
+  addPolygons(data = shape_rs, weight = 1, color = "gray",
+              highlightOptions = highlightOptions(color =
+                    "blue", weight = 3, bringToFront = TRUE)) %>%
+  addPolygons(data = shape_brs, weight = 2, color = "red") %>%
+  addPolygons(data = shape_pm, weight = 2, color = "orange",
+              highlightOptions = highlightOptions(color = "green", weight = 3, bringToFront = TRUE))
+
+
+```
+ fazendo controle para tirar os layers :
+```{r, echo=TRUE}
+
+
+leaflet() %>%
+  addTiles(group = "openStreetMap") %>%
+  addProviderTiles("Stamen.Toner", group = "Toner By Stamen") %>%
+  addProviderTiles("Esri.WordlTopoMap", group = "Topografia") %>%
+  
+  addPolygons(data = shape_rs, weight = 1,color = "gray") %>%
+  addPolygons(data = shape_pm, weight = 2, color = "red", group = "Planalto Medio") %>%
+  addPolygons(data = shape_brs, weight = 2, color = "orange", group = "Rodovias") %>%
+  #Layers Control
+  addLayersControl(
+    baseGroups = c("openStreetMap", "Toner By Stamen", "Topografia"),
+    overlayGroups = c("Planalto Medio", "Rodovias"),
+    options = layersControlOptions(collapsed = FALSE)
+  )
+  
+
+```
+ 
+
+#saindo de mapas
+
+exemplo plotly
+
+```{r, echo=TRUE}
+library(plotly)
+
+arquivo2 = url("http://usuarios.upf.br/~holbig/aulas/MCA016/temperatura.Rda")
+
+load (arquivo2)
+
+```
+
+Exemplo 1
+```{r, echo=TRUE}
+p1 <- plot_ly(temperatura, x = ~ano, y = ~menor_minima) %>%
+  add_lines(name = ~"Menor Minima")
+p2 <- plot_ly(temperatura, x= ~ano, y = ~maio_maxima) %>%
+  add_lines(name = ~"Maior Maxima")
+subplot(nrows = 2, sharex = TRUE, p1, p2)
+
+```
+
+
+

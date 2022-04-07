@@ -1,0 +1,86 @@
+---
+title: "Titanic"
+author: "Lucas Zanolla"
+date: "6 de abril de 2018"
+output_file: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r titanic, echo=FALSE}
+titanic <- read.table("titanic.txt",header = TRUE)
+
+```
+
+
+Com a Tabela sobre o trágico acontecimento do Titanic, é possivel comparar alguns dados para se obter informações relevantes sobre os sobreviventes. Utilizando a ferramente R (junto com o R Markdown) foi feito calculos de probabilidade e estatística para demonstrar essas informações.
+Para fazer uma análise exploratória é importante notar fatores(variáveis) que form influentes no acontecimento. No caso desse naufrágio e com o banco de dados utilizado, as variáveis mais importantes para serem analizadas são: Sexo, idade e classe dos passageiros em relação a porcentagem de sobreviventes.
+Foram criadas novos Datasets, menores, isolando algumas variáveis para serem usados como comparação ao dataset original e analizer os que tem uma porcentagem de sobrevivencia maior.
+Foram criados datasets com os grupos "mulher", "homens", "idosos", "crianças" e "adultos". 
+
+
+```{r echo=TRUE}
+#titanic = read.table("titanic.txt")
+female <- titanic[titanic$Sex == "female", ]
+male <- titanic[titanic$Sex == "male", ]
+
+criancas <- titanic[titanic$Age < 5, ]
+idosos <- titanic[titanic$Age > 65, ]
+adultos <- titanic[titanic$Age < 65 && titanic$Age > 5, ]
+
+prop.table(table(titanic$Survived)) *100
+prop.table(table(titanic$Sex)) *100
+prop.table(table(male$Survived)) *100
+prop.table(table(female$Survived)) *100
+prop.table(table(titanic$Sex, titanic$Survived)) *100
+barplot(table(titanic$Sex, titanic$Survived))
+
+
+```
+
+
+Os resultados obtidos são de grande valor pois há muito a ser entendo sobre o naufrágio com esses dados. Primeiramente o fato de somente 38.38% das pessoas sobreviveram ao desastre, e entre essas 38.38%, 26.15% eram mulheres e somente 12.23% eram homens.
+Para analizar os dados de forma mais individual, nota-se que 64.7% da população do Titanic era Masculina e sómente 35.3% era feminina. 
+
+Entre os Homens, somente 18.89% deles sobreviveram, diferentemente do dado coletado no dataset "female" que 74.2% das Mulheres sobreviveram! Resultado muito interessante pelo fato de ter um diferença tao grande. 
+
+O Grafico demonstra esta diferença, mostrando em tom claro os Homens e em tom escuro as Mulheres. (dados tendo em vista que 1 é verdadeiro com o termo "sobreviventes")
+
+Tendo em vista desta diferença, é interessante fazer o mesmo estudo em relação a idade das pessoas embarcadas.
+
+
+```{r echo=TRUE}
+prop.table(table(criancas$Survived))*100
+prop.table(table(criancas$Sex, criancas$Survived)) *100
+
+prop.table(table(adultos$Survived))*100
+prop.table(table(adultos$Sex, adultos$Survived)) *100
+
+prop.table(table(idosos$Survived))*100
+prop.table(table(idosos$Sex, idosos$Survived)) *100
+
+boxplot(titanic$Age ~ titanic$Survived)
+
+
+```
+
+
+Este resultado demonstrou que 67.5% das pessoas com menos de 5 anos na época, foram salvas, e curiosamente, diferente do resultado com todos passageiros,o fato de ser do sexo masculo ou feminino não importou tanto para essa categoria. As porcentagens obtidas pelo estudo foram de que 67.5% dos sobreviventes com idade menos que 5 anos, 30% era do sexo feminino e 37.5% do sexo masculino. Uma diferença basicamente irrelevante ao comparar que havia mais homens do que mulheres no local.
+
+A grande diferença foi entre os "adultos" (maior que 5 anos e menor que 65) onde somente 38% sobreviveram e a grande maioria era mulher com 26% sendo que a maioria dos adultos eram homens (74% do total de pessoas). Isso ajuda a entender os dados prévios.
+
+Curiosamente o grupo de "idosos" (maior que 65 anos) só havia homens e somente 12.5% deles sobreviveram.
+
+
+
+```{r echo=TRUE}
+prop.table(table(titanic$Pclass, titanic$Survived)) *100
+barplot(table(titanic$Pclass, titanic$Survived))
+```
+
+
+O ultimo Dataset estudado é a Classe dos passageiros. Este também teve grande influencia para determinar os sobreviventes. A porcentagem de pessoas que estavam na primeira classe é de 24% e mais da metade deles sobreviveram (62.5%). O valor de sobrevivencia vai diminuindo com relação a piora das classes. Um pouco menos da metada das pessoas da segunda classe sobreviveram e nao a grande maioria como a primeira classe. A terceira classe, e menos favoravel, foi a que mais sofreu com a tragédia, sendo que 41% do total de passageiros que morreram nessa tragégia eram da terceira classe.
+
+Com essa análise exploratória, é possivel fazer uma conclusão que a maior porcentagem de sobreviventes foram as mulheres, as crianças e as pessoas que estavam na primeira classe.

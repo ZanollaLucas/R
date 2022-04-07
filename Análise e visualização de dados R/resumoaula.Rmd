@@ -1,0 +1,380 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+#Pacotes
+```{r}
+library(tidyverse)
+library(magrittr)
+library(readxl)
+library(dplyr)
+library(ggplot2)
+library(pastecs)
+```
+
+```{r}
+aluguel <- read_delim("C:/Users/LucasZan/Desktop/Alura/Análise e visualização de dados R/aluguel.csv", 
+    ";", escape_double = FALSE, trim_ws = TRUE)
+```
+
+Vendo estrutura da Base
+```{r}
+str(aluguel)
+#head(aluguel) serve para ver os primeiros valores da base
+```
+
+
+Verificando duplicidade de dados
+```{r}
+aluguel_Tratado <- unique(aluguel)
+# o <- significa q o resultado da função vai ir para aluguel_T
+# = faria a mesma coisa
+#se der só o comando unique ele já demontra as duplicidades
+```
+
+Vendo tipo de dados da base
+```{r}
+glimpse(aluguel_Tratado)
+```
+
+Fazendo a seleção de campos da base ou retirando da base
+```{r}
+selec1 <- select(aluguel_Tratado,Tipo, Bairro, Quartos, Area, Valor)
+
+#assim está sendo selecionado o q se quer da base
+#caso queria deletar somente algum campo fazer o mesmo usando select(base,-campo_deletado)
+```
+
+Filtros na base:
+
+Tipo = Casa
+
+Quartos >= 4
+Vagas >= 3 
+Suites >= 3
+Valor <= 15000
+
+
+```{r}
+filtrado <- filter(aluguel_Tratado, Tipo == "Casa", Quartos >= 4 , Vagas >= 3 , Suites >= 3, Valor <= 15000)
+
+glimpse(filtrado)
+```
+
+Filtro 2
+Bairros: Tijuca e Leblon
+
+```{r}
+Filtrado2 <- filter(filtrado, Bairro %in% c("Barra da Tijuca", "Leblon" ))
+```
+
+
+
+Ordenar a Base de dados
+
+```{r}
+Ordenado_Cresc <- arrange(Filtrado2, Valor)
+
+#glimpse(Ordenado_Cresc)
+
+#caso queira descresnte usar o arrange mas botar desc(Valor)
+
+#Criando novos campors na base de dados
+
+Ordenado_Cresc <- mutate(Ordenado_Cresc, Indicador = (Area/Valor)*100)
+
+```
+
+
+
+```{r}
+Casas_finais = mutate(Ordenado_Cresc, visitas = ifelse(Indicador > 5, "Ok", "Nok"))
+
+filter(Casas_finais, visitas == "Ok")
+
+#Combinando filter com select
+
+Casas_finais2 <- select(filter(Casas_finais, visitas == "Ok"), Area, Valor, Indicador, visitas)
+
+Casas_finais2
+```
+
+Utilização do pipe %>%  ctrl+shit+M
+
+```{r}
+#sem utilização do pipe
+
+casas = filter(aluguel_Tratado, Tipo == "Casa")
+casas_f1 = filter(casas, Quartos >= 4, Valor <= 15000)
+casas_f2 = filter(casas_f1, Bairro %in% c("Barra da Tijuca", "Leblon"))
+arrange(casas_f2, desc(Valor))
+
+#com o pipe
+
+casas_Select <- aluguel_Tratado %>% 
+  filter(Tipo=="Casa", Quartos >= 4, Valor <= 15000, Bairro %in% c("Barra da Tijuca", "Leblon")) %>% 
+  arrange(desc(Valor))
+
+casas_Select
+  
+
+
+```
+
+
+Gerando novas informações de forma agrupada e sumarizada
+group_by
+summarise
+summary(base de dados)
+
+```{r}
+summary(aluguel_Tratado)
+```
+
+
+```{r}
+
+aluguel_Tratado %>% 
+  group_by(Tipo) %>% 
+  summarise(qtde = n())
+
+
+```
+
+Agrupamento por mais de um campo
+Tipo e Bairro
+```{r}
+aluguel_Tratado %>% 
+  group_by(Tipo, Bairro) %>% 
+  summarise(qtde = n())
+```
+
+Outros comandos para se utilizar no summarise:
+max, min , media, ...
+
+
+```{r}
+aluguel_Tratado %>% 
+  group_by(Tipo) %>%
+  summarise(qtde = n(), media = mean(Valor))
+```
+
+as médias com NA é quando não algum dos dados tem valor ausente (necessario tratar)
+usando função na.rm=TRUE
+
+```{r}
+aluguel_Tratado %>% 
+  group_by(Tipo) %>% 
+  summarise(qtde = n(), media = mean(Valor, na.rm = TRUE))
+```
+
+Combinando summarise
+
+```{r}
+aluguel_Tratado %>% 
+  group_by(Tipo) %>% 
+  summarise( media = mean(Valor, na.rm = TRUE),
+             mimino = min(Valor, na.rm = T),
+             maximo = max(Valor, na.rm = T),
+             Total = n() )
+```
+
+#Relacionamento entre diferentes tabelas (data frames)
+
+
+Criando tabelas Cargo e Local
+```{r}
+cargo <- data.frame(c("Andre", "Marcos", "Fernando", "Julia"), c("Analista", "Analista", "Coordenador", "Gerente"))
+colnames(cargo) <- c("Nome","Cargo")
+
+local <- data.frame(c("Fábio", "Marcos", "Fernando", "Julia"), c("Comercial", "CRM", "TI", "RH"))
+colnames(local) <- c("Nome","Local")
+
+cargo
+local
+```
+
+Juntando tabelas pelo left_join
+```{r}
+cargo %>% 
+  left_join(local, by = "Nome")
+```
+
+Juntando tabelas pelo right_join
+```{r}
+cargo %>% 
+  right_join(local, by = "Nome")
+```
+
+Juntando pelo inner_join, vai juntar somente o q é comum por essas tabelas (elimina valores ausentes)
+
+```{r}
+cargo %>% 
+  inner_join(local, by = "Nome")
+```
+
+Juntando pelo full_join, vai juntar tudo e juntar o q é comum 
+```{r}
+cargo %>% 
+  full_join(local, by = "Nome")
+```
+
+Da mesma forma o anti_join vai resultador somente o que não é encontrado na relação (somente os valores da tabela inicial)
+
+```{r}
+cargo %>% 
+  anti_join(local, by = "Nome")
+```
+```{r}
+local %>% 
+  anti_join(cargo, by = "Nome")
+```
+
+
+```{r}
+#Dados da Tabela A
+tabela_A = data.frame(c("A125", "B235","C355","D354","Q111","X000"),
+c("Andre", "Marcos", "Fernanda", "Julia", "Maria", "Jose"),
+c(21,28,29,35,22,39))
+colnames(tabela_A) = c("id","Nome","Idade")
+
+#Dados da Tabela B
+tabela_B = data.frame(c("A125","C355","D354","Q111"),
+c("BA", "RJ", "RS", "SP"),
+c("Analista", "Analista", "Gerente", "Coordenador"),
+c(0,0,1,2))
+colnames(tabela_B) = c("id", "UF", "Cargo", "N de Filhos")
+```
+
+```{r}
+tabela_A  %>% 
+left_join(tabela_B , by = "id")
+```
+
+Lendo do EXCEL
+```{r}
+
+funcionarios <- read_excel("C:/Users/LucasZan/Desktop/Alura/Análise e visualização de dados R/funcionarios.xlsx")
+View(funcionarios)
+```
+
+
+#estrutura da base
+```{r}
+str(funcionarios)
+```
+
+
+#ajustar alguns campos da base
+
+```{r}
+func_t <- funcionarios %>% 
+  mutate(civil = factor(civil, label = c("solteiro","casado"), levels = 1:2),
+    instrucao = factor(instrucao, label = c("1º", "2º","superior"), levels = 1:3),
+    regiao = factor(regiao, labels = c("capital", "interior", "outros","outros"), levels = c(2,1,3,9)))
+```
+
+#estudando variáveis
+#observar frequencias absolitas e relativas
+
+```{r}
+#estado civil
+freq_absoluta <- table(func_t$civil)
+freq_relatica <- prop.table(freq_absoluta) *100
+#juntando tabelas com rbind
+t(rbind(freq_absoluta, freq_relatica))
+```
+
+```{r}
+#regiao
+freq_absoluta <- table(func_t$regiao)
+freq_relatica <- prop.table(freq_absoluta) *100
+#juntando tabelas com rbind
+t(rbind(freq_absoluta, freq_relatica))
+```
+
+#plotagem com barplot e pizza
+
+```{r}
+barplot(table(func_t$civil),col = c("blue","red"))
+```
+
+```{r}
+#estado civil
+freq_absoluta <- table(func_t$civil)
+freq_relativa <- prop.table(freq_absoluta) *100
+
+rotulos<- c("solteiro","casado")
+rotulos<- paste(rotulos,format(round(freq_relativa,2), nsmall = 2))
+rotulos<- paste(rotulos,"%", sep = " " )
+pie(table(func_t$civil), labels = rotulos, col = c("blue","red"))
+```
+
+#visualização com Boxplot
+
+diferenciando algo POR (~) algo
+
+```{r}
+#salatrio por instrução
+boxplot(salario ~ instrucao, func_t)
+
+boxplot(salario ~ regiao, func_t)
+
+```
+
+Para vizualizar a variação por 3 variaveis tipo salario regiao e instrução por der por graficos 3D ou usando ggplot
+
+```{r}
+ggplot(data = func_t) +
+  geom_boxplot(mapping = aes(x= regiao,
+                             y = salario,
+                             color = instrucao))+
+  facet_grid((regiao ~ .))
+```
+
+
+
+#Tratamento de outliers
+
+```{r}
+boxplot(func_t$filhos)
+```
+
+Com o boxplot da pra ver um valor acima de 50 ... provavelmente erro da base pq ninguem tem mais do que 50 filhos ou seja filtro
+
+```{r}
+func_t2 <- filter(func_t, filhos <=10)
+
+stat.desc(func_t2$filhos)
+
+boxplot(func_t2$filhos)
+```
+
+
+```{r}
+#Carrega a base de dados cars
+datasets::cars
+
+#Cria gráficos de distribuição e boxplots
+
+par(mfrow=c(1,2))
+hist(cars$speed, main = "velocidade")
+hist(cars$dist, main = "distancia")
+boxplot(cars$speed, main = "velocidade")
+boxplot(cars$dist, main = "distancia")
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+

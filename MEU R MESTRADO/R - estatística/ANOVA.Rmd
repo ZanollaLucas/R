@@ -1,0 +1,125 @@
+---
+title: "Aula dia 14/04 (ANOVA)"
+author: "Lucas Zanolla"
+date: "14 de abril de 2018"
+output_output: html_document
+---
+
+
+## Teoria
+https://homerhanumat.github.io/tigerstats/
+
+https://homerhanumat.github.io/tigerstats/ttestGC.html
+
+ANOVA :
+
+https://drive.google.com/file/d/1MGx7SJgHzQrM0MtKxkJfYHcPntkTU_RV/view
+
+ analise sobre a rasão das variancias. 
+ 
+ Efeito ( conceito): 
+            y = u+alpha ( "efeito") + erro
+            
+
+há duas variançias, entre grupos e dentro dos grupos.
+
+variancias divididas 
+
+Grafico F <- variancias divididas 
+
+hipotese nula é que as variancias são iguais,
+
+hipotese alternativa, pelo menos um deles é diferente
+            
+##começando o calculo
+
+soma de quadrados 
+
+(media 1 - media geral)² + (media 2 - media geral)² + (...)² + ...
+
+fazer isso pra media geral e para cada grupo
+ e gerar um quadro da análise
+ 
+P valor associado com graus de liberdade de grupo e geral, achar DF
+
+
+```{r, echo=TRUE}
+group <- c(1,1,1,2,2,2,3,3,3)
+y <- c(43, 40, 35, 41, 47, 54, 39, 34, 37)
+group <- as.factor(group)
+analysis <- lm(y ~ group)
+
+summary(analysis)
+anova(analysis)
+
+
+```
+Olhando o valor de Pr(>F) é possivel verificar a hipotese fazendo a comparação com o alfa.
+
+quando a hipotese nula é regeitada é preciso descobrir qual(ou quais) grupo(s) são os diferentes
+ 
+
+
+
+```{r, echo=TRUE}
+res <- aov(y ~ group)
+TukeyHSD (res)
+
+```
+
+Olhar o P adj para indentificar os valores entre grupos.
+
+##Exercicio 1
+
+Gerar grupos com valores aleatórios, (utilizar o set.seed para manter os valores aleatorios) e calcular ANOVA para esses grupos
+
+
+```{r, echo=TRUE}
+set.seed(23)
+dados<- c(rnorm(4,40,3), rnorm(4,45,3.4), rnorm(4,49,2.8),rnorm(4,47,3.9))
+
+efeito<-c(rep("A",4), rep("B",4), rep("C",4), rep("D",4))
+df<- data.frame(efeito,dados)
+
+attach(df)
+hist(dados)
+boxplot(dados)
+summary(dados)
+
+str(df)
+
+m1<- aov(dados~efeito,data=df)
+
+summary(m1)
+
+
+
+```
+
+como para alpha = 0.05 pelo menos um grupo foi significavo é necessario descobrir qual.
+
+
+```{r}
+TukeyHSD(m1)
+plot(TukeyHSD(m1))
+
+detach(df)
+```
+
+Analizando o valor p adj é possivel notar que o o efeito C-A tem um valor menor que 0.05. ou seja significativo no teste F.
+
+
+
+##Exercicio 2
+
+```{r, echo=TRUE}
+
+limpo<- c(4, 5, 6, 5, 7, 9, 8, 12, 10, 12, 11, 9, 6, 6, 4, 4, 13, 15, 12, 12, 12, 13, 10, 13)
+
+
+
+```
+
+
+
+

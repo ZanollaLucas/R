@@ -1,0 +1,364 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+```{r}
+library(tigerstats)
+library(tidyverse)
+library(readxl)
+library(ggplot2)
+library(cowplot)
+```
+
+# Exercicio 1
+
+Exercício 1 (Bruni, Adriano Leal, 2005, p.87):
+Os dados seguintes apresentam as produções diárias em unidades da fábrica de roupas na moda ltda. Com base nos números fornecidos, determine os quartis.
+
+```{r}
+Roupas <- c(10,10,11,11,12,15,15,16,19,22,22,25,27,28,30,30,32,35,36,37,37,38,40,41,45)
+```
+
+Para determinar os quartis é utilizado a função summary(), a qual calcula o valor minimo, primeiro quartil, mediana, média, terceiro quartil e o valor máximo:
+```{r}
+summary(Roupas)
+```
+valor minimo:10
+primeiro quartil:15
+mediana:27
+média:25.76
+terceiro quartil: 36
+valor máximo: 45
+
+
+
+# Exercicio 2
+
+Exercício 2 (Bruni, Adriano Leal, 2005, p.283):
+Considere o exemplo fictício da Ceres Fruticultura Irrigada Ltda. A empresa coletou dados referentes ao volume de chuvas nos últimos seis anos e a produtividade média por hectare em seis culturas diferentes: manga, abacate, ameixa, goiaba e acerola. Apresente o histograma de dispersão e suas principais informações estatísticas.
+
+
+Primeiramente precisamos extrair os dados do exercicios, os quais estão no excel
+```{r}
+Ex2 <- read_excel("C:/Users/LucasZan/Desktop/Ex2.xlsx")
+## View(Ex2)
+```
+
+Novamente pra começar buscamos os valores estatísticos básicos utilizando o summary(), o que vai nos demonstrar os falores de quartils, mediana e média
+
+```{r}
+summary(Ex2)
+```
+
+Gerando os Histogramas
+
+```{r}
+plot1<- ggplot(data=Ex2, aes(x=`Ano i`, y=chuvas)) +
+  geom_bar(stat="identity", fill="steelblue") +
+  geom_text(aes(label=chuvas), vjust=1.6, color="white", size=3.5)+
+  theme_minimal()
+
+plot2<- ggplot(data=Ex2, aes(x=`Ano i`, y=manga)) +
+  geom_bar(stat="identity", fill="red") +
+  geom_text(aes(label=manga), vjust=1.6, color="white", size=3.5)+
+  theme_minimal()
+
+plot3<- ggplot(data=Ex2, aes(x=`Ano i`, y=abacate)) +
+  geom_bar(stat="identity", fill="green") +
+  geom_text(aes(label=abacate), vjust=1.6, color="white", size=3.5)+
+  theme_minimal()
+
+plot4<- ggplot(data=Ex2, aes(x=`Ano i`, y=ameixa)) +
+  geom_bar(stat="identity", fill="purple") +
+  geom_text(aes(label=ameixa), vjust=1.6, color="white", size=3.5)+
+  theme_minimal()
+
+plot5<- ggplot(data=Ex2, aes(x=`Ano i`, y=goiaba)) +
+  geom_bar(stat="identity", fill="pink") +
+  geom_text(aes(label=goiaba), vjust=1.6, color="white", size=3.5)+
+  theme_minimal()
+
+plot6<- ggplot(data=Ex2, aes(x=`Ano i`, y=acerola)) +
+  geom_bar(stat="identity", fill="coral3") +
+  geom_text(aes(label=acerola), vjust=1.6, color="white", size=3.5)+
+  theme_minimal()
+
+plot_grid(plot1, plot2, plot3, plot4, plot5, plot6)
+
+```
+
+Para calcular a regressão é utilizado a função lm, verificando a relação entre a chuva e as médias por hectare das 5 culturas
+
+
+```{r}
+reg1 <- lm(manga ~ chuvas, data = Ex2)
+summary(reg1)
+cor(Ex2$chuvas, Ex2$manga)
+```
+
+Tendo um R² igual a 1 significa que a manga é totalmente relativa a chuva, sendo assim é possivel demonstar pelo gráfico de acordo com o aumento da chuva também aumenta a quantidade média de manga por hectar e a linha da regressão linear passa por todos os pontos.
+
+
+```{r}
+plot(Ex2$chuvas, Ex2$manga)
+abline(reg1)
+```
+
+```{r}
+reg2 <- lm(abacate ~ chuvas, data = Ex2)
+summary(reg2)
+cor(Ex2$chuvas, Ex2$abacate)
+```
+
+Tendo um R² de 0.9502 significa que a manga é extremamente relativa a chuva, sendo assim é possivel demonstar pelo gráfico de acordo com o aumento da chuva também aumenta a quantidade média de abacate por hectar e a linha da regressão linear passa proxima a todos os pontos.
+
+
+```{r}
+plot(Ex2$chuvas, Ex2$abacate)
+abline(reg2)
+```
+
+
+```{r}
+reg3 <- lm(ameixa ~ chuvas, data = Ex2)
+summary(reg3)
+cor(Ex2$chuvas, Ex2$ameixa)
+```
+Tendo um R² de 0.6204 significa que a manga tem relatividade a chuva de 62% e correlação negativa : -0.7876 demontra q a relação é oposta, ou seja, quanto mais chuva, menor a média de ameixas por hectar.
+
+```{r}
+plot(Ex2$chuvas, Ex2$ameixa)
+abline(reg3)
+```
+
+
+```{r}
+reg4 <- lm(goiaba ~ chuvas, data = Ex2)
+summary(reg4)
+cor(Ex2$chuvas, Ex2$goiaba)
+```
+Diferentemente de todas as outras culturas, o resultado da regressão linear da goiaba em relação a chuva é tão pequena é pode ser desconsiderada, tendo uma correlação de aproximadamente 1.7% somente.
+
+```{r}
+plot(Ex2$chuvas, Ex2$goiaba)
+abline(reg4)
+```
+
+
+```{r}
+reg5 <- lm(acerola ~ chuvas, data = Ex2)
+summary(reg5)
+cor(Ex2$chuvas, Ex2$acerola)
+```
+Tendo um R² igual a 1 significa que a acerola é totalmente relativa a chuva, mas com a sua correlação igual a -1 demontra q a relação é de que com o aumento da chuva diminui a quantidade média de acerola por hectar e a linha da regressão linear passa por todos os pontos.
+
+```{r}
+plot(Ex2$chuvas, Ex2$acerola)
+abline(reg5)
+```
+
+
+
+
+
+
+
+
+
+
+
+# Exercicio 3
+
+Exercício 3 (Bruni, Adriano Leal, 2005, p.278):
+Uma rede de lojas de confecções que coletou uma amostra de dados passados referentes a seus gastos com publicidade ($mil) e seu volume de vendas ($mil). Os dados são: determine o gráfico de dispersão e as principais estatísticas descritivas para posterior inferências.
+
+```{r}
+ex3 <- data.frame("GP" = c(3,4,4.8,5.9,8,8.5,10,12,14), "Vendas"= c(7,14,14.3,14.7,15,15.4,19,28,32))
+```
+
+Principais estatísticas descritivas
+```{r}
+summary(ex3)
+```
+
+
+
+```{r}
+regex3 <- lm(Vendas ~ GP, data = ex3)
+summary(regex3)
+cor(ex3$GP, ex3$Vendas)
+```
+Corelação entre valor de 0.93 e possitiva, R² de 0.8665
+
+
+Gráfico de dispersão com reta de regrassão
+```{r}
+plot(ex3$GP, ex3$Vendas)
+abline(regex3)
+```
+
+
+
+#Exercicio 4
+
+Exercício 4 (Fávero, base de dados, 2018):
+
+```{r}
+ex4 <- read_excel("C:/Users/LucasZan/Downloads/2.xlsx")
+#View(ex4)
+```
+
+```{r}
+summary(ex4)
+```
+Dividindo os atrasados dos nao atrasdos
+
+```{r}
+atrasados <- ex4[ex4$`Chegou Atrasado à Escola (Dummy Sim = 1;  Não = 0) (Y)`  == 1,]
+natrasados <- ex4[ex4$`Chegou Atrasado à Escola (Dummy Sim = 1;  Não = 0) (Y)` == 0,] 
+prop.table(table(ex4$`Chegou Atrasado à Escola (Dummy Sim = 1;  Não = 0) (Y)`)) *100
+```
+59% dos alunos chegaram atrasados
+
+```{r}
+summary(atrasados)
+```
+distancia minima 1
+media 14.57
+max 29
+
+
+```{r}
+summary(natrasados)
+```
+minima 9.5
+media 13.35
+max 23.5
+
+```{r}
+cor(ex4$`Chegou Atrasado à Escola (Dummy Sim = 1;  Não = 0) (Y)`,ex4$`Distância (km) (X1)`)
+regex41 <- lm(`Chegou Atrasado à Escola (Dummy Sim = 1;  Não = 0) (Y)` ~ `Distância (km) (X1)`, data = ex4)
+summary(regex41)
+```
+existe uma correlação entre a distancia e o atraso, mas ela é MUITO baixa (0.139) e um R² de somente 0.0193 
+
+```{r}
+cor(ex4$`Chegou Atrasado à Escola (Dummy Sim = 1;  Não = 0) (Y)`,ex4$`Quantidade Semáforos   (X2)`)
+regex42 <- lm(`Chegou Atrasado à Escola (Dummy Sim = 1;  Não = 0) (Y)` ~ `Quantidade Semáforos   (X2)`, data = ex4)
+summary(regex42)
+```
+existe uma correlação entre a quantidade de semafors e o atraso, mas ela é MUITO baixa (0.383) e um R² de somente 0.147
+
+
+
+```{r}
+ex4$`Chegou Atrasado à Escola (Dummy Sim = 1;  Não = 0) (Y)` <- as.factor(ex4$`Chegou Atrasado à Escola (Dummy Sim = 1;  Não = 0) (Y)`)
+
+plotx <- ggplot(ex4, aes(y = `Distância (km) (X1)`, x = `Chegou Atrasado à Escola (Dummy Sim = 1;  Não = 0) (Y)`)) +
+                  geom_boxplot()
+plotx               
+
+```
+```{r}
+ploty <- ggplot(ex4, aes(y = `Quantidade Semáforos   (X2)`, x = `Chegou Atrasado à Escola (Dummy Sim = 1;  Não = 0) (Y)`)) +
+                  geom_boxplot()
+ploty  
+
+```
+ pelos box plots é possivel ver que os alunos que nao se atrasaram tem 10 sinaleiras ou menos (com uma exeção) onde todos que se atrasaram pegam 10 sinaleiras ou mais
+ 
+
+ 
+
+
+
+#Exercicio 5
+Exercício 5 (Larson e Farber, 2010, p.412):
+A idade (em anos) de sete crianças e o número de palavras que compõem o vocabulário. Represente o gráfico de dispersão e a reta de regressão. Explique os resultados.
+
+```{r}
+ex5 <- data.frame("Idade" = c(3,4,4,5,6,2,3), "TVocabulario"= c(1100,1300,1500,2100,2600,460,1200))
+```
+
+```{r}
+regex5 <- lm(TVocabulario ~ Idade, data = ex5)
+summary(regex5)
+cor(ex5$Idade, ex5$TVocabulario)
+```
+Correlação de 0.982 entre a Idade e o Tamanho do Vocabulário de forma positiva e R² igual a 0.9657 
+
+
+Grafico de dispersão com a Reta de Regressão demontrando a correlação possiva
+```{r}
+plot(ex5$Idade, ex5$TVocabulario)
+abline(regex5)
+```
+
+
+#Exercicio 6
+
+
+Exercício 6 (Larson e Farber, 2010, p.412):
+O número de horas que 13 alunos passaram estudando para um teste e a pontuação nele. Represente o gráfico de dispersão e a reta de regressão. Explique os resultados.
+
+
+```{r}
+ex6 <- data.frame("Horas_estudando" = c(0,1,2,4,4,5,5,5,6,6,7,7,8), "Pontuacao_teste" = c(40,41,51,48,64,69,73,75,68,93,84,90,95))
+```
+
+```{r}
+regex6 <- lm(Horas_estudando ~ Pontuacao_teste, data = ex6)
+summary(regex6)
+cor(ex6$Pontuacao_teste, ex6$Horas_estudando)
+```
+Correlação de 0.922 positiva e R² de 0.851
+
+Grafico de dispersão com a Reta de Regressão demontrando a correlação possiva
+```{r}
+plot(ex6$Pontuacao_teste, ex6$Horas_estudando)
+abline(regex6)
+```
+
+
+
+#Exercicio 7
+Exercício 7 (Larson e Farber, 2010, p.413):
+Usando o diagrama de dispersão dos dados sobre os salários dos administradores apresentados, que tipo de correlação, se é que há alguma, você acha que os dados têm? Aproveite, calcule a regressão linear simples e explique os resultados. Escreva uma paragrafo descrevendo a relação de causa e efeito entre a idade e o salário anual do administrador.
+
+```{r}
+ex7 <- read_excel("C:/Users/LucasZan/Downloads/7.xlsx")
+```
+
+```{r}
+regex7 <- lm(`Salário anual (em mil reais)` ~ `Idade (em anos)`, data = ex7)
+summary(regex7)
+cor(ex7$`Idade (em anos)`, ex7$`Salário anual (em mil reais)`)
+```
+Correlação positiva de 0.9388 e R² de 0.8814, pelo grafico é possivel observar que ...
+
+```{r}
+plot(ex7$`Idade (em anos)`, ex7$`Salário anual (em mil reais)`)
+abline(regex7)
+```
+
+
+#Exercicio 8
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

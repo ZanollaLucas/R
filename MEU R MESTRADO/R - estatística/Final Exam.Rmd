@@ -1,0 +1,107 @@
+---
+title: "Trabalho Final"
+author: "Lucas Zanolla"
+date: "5 de maio de 2018"
+output_file: html_document
+---
+
+## Pergunta 2
+
+```{r,echo=TRUE}
+library(tigerstats)
+##letra A:
+pnormGC(186.6, region="above", mean=167.9, sd=8.5, graph=TRUE)*100
+##letra B:
+pnormGC(157.7, region="below", mean=167.9, sd=8.5, graph=TRUE)*100
+##letra C:
+pnormGC(c(159.4,176.4), region="between", mean=167.9, sd=8.5, graph=TRUE)*100
+##letra D:
+
+```
+
+Apartir dos graficos nota-se que os dados amostrais da altura dos 100 alunos é uma distribuição normal, pois o histograma demontra uma que a média a mediana e a moda estão proximas, formando uma curva normal quase simétrica. A analise do boxplot demonstra que sómente 2 alunos estão fora da curva, tanto um para baixo e um para cima.
+
+
+## Pergunta 3
+Analisando o valor do resultado do t.test é possivel afirmar que a nossa hipótese nula é negada, pois felizmente nossos lagartos tem o peso menor que 2.5 (média é de 2.305) e tendo uma probabilidade de somente 25% de os lagartos estarem com media 2.5.
+
+## Pergunta 4
+A hipótese nula é rejeitada pois a diferença das médias é diferente de zero, e tem uma probabilidade de somente 2.2x10^-4% de o tempo de espera ser o mesmo, ou seja uma probabilidade muito pequena de acontecer.
+
+## Pergunta 6
+
+```{r,echo=TRUE}
+ttestGC(mean = 121.2,n= 105, sd= sqrt(140.5), conf.level = 0.95)
+```
+Lower bound é de 118.9 EUR
+Upper bound é de 123.49 EUR
+
+## Pergunta 7
+
+```{r, echo=TRUE}
+tstatistic  <- ((194-200)/(sqrt(144.44/149)))
+tstatistic
+pnorm(tstatistic)
+```
+Alternativa b) -6.094 é a correta.
+
+Utilizando a tabela T para verificar valor de comparação com alpha de 0.05 e 148 graus de liberdade, temos o valor de 1.65 para T desejado.
+Como o valor calculado (6.094) é maior que o valor retirado da tabela, rejeitamos a hipotese nula (hipotese nula é que não há diferença entre as médias).
+
+## Pergunta 8
+
+a) A variável independente é o habitat, pois ela que fará a comparação em relação ao resultado de forma relevante. E as variáveis dependentes são a produção dos fungos, pois ele é a variável resposta.
+
+B) Com a utilização da ferramente disponível (TurkeyHsD) é possivel ver a comparação entre os grupos e tirar conclusões sobre a diferença da média dos grupos comparados. É  possivel notar que TODOS os efeitos tem um valor menor que 0.05(nenhum passa na linha que demonstra uma média igual), ou seja significativo no teste F em relação a 95% family-wise confidence level.
+
+## Pergunta 9
+
+Analizando os dados obtidos é possível perceber que o Recipiente 1 é o melhor para ser utilizado se levar em conta ambas as espécies. Se for levar em consideração sómente a espécie 1, o recipiente 2 teve um resultado um pouco melhor, mas em compensação o seu resultado com a Espécie 2 foi muito inferior a qualquer outro resultado. O recipiente 3 foi o que teve o pior desempenho geral.
+Concluindo que o melhor recipiente é o 1!
+
+As espécies se comportam de maneira inversa em relação aos recipiente 2, mas para o recipiente 1 e 3 são semelhantes.
+
+## Pergunta 10
+
+a) sim ele atende, pois os dados estão de uma maneira linear.
+
+b) De acordo com os resultados do summary aproximadamente 72% da variação em Y é correlacionado com X.
+
+c) Apartir dos dados e dos resultados obtidos é possivel garantir uma relação positiva entra as variávies.
+
+d)
+```{r,echo=TRUE}
+y = 0.6760 + 1.2701 *-0.1117
+y
+```
+y tem o valor de 0.5341298 para a mediana de x.
+
+
+## Pergunta 11
+
+a) density ~ 1/(1 + exp((xmid - log(conc))/scal))
+valores estimados 
+xmid 1.48309
+scal 1.04145
+
+density ~ 1/(1 + exp((1.48309 - log(8.345))/1.04145))
+```{r, echo=TRUE}
+density <- 1/(1 + exp((1.48309 - log(8.345))/1.04145))
+density
+```
+
+densidade quando a concentração é 8.345 é de 0.6486607
+
+b) A diferença pem relação a determinação dos parâmetros é que para que seja não-linear, é necessario lidar com pelo menos uma derivada da variável.
+
+
+## Pergunta 12
+
+a) A regressão Logística é valida para avaliar os aspctos comparativos do conjunto de dados do Titanic, pois ela utiliza de uma variável binária ("sim" ou "nao") para fazer a regressão.
+
+b)Nesse caso a resposta é a sobrevivência do passageiro.
+
+
+
+
+

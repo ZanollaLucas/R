@@ -1,0 +1,6 @@
+data("anscombe")
+str(anscombe)
+plot(anscombe$x1, anscombe$y1)
+m0 <- lm(y1~x1, data = anscombe)
+summary(m0)
+abline(m0)
